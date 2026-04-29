@@ -184,6 +184,36 @@ class Account:
             return f"Error: {str(e)}"
         finally:
             conn.close()
+## Hana Nazmy---------------            
+    @staticmethod
+    def update_currency_type(user_id, currency_type):
+        """Updates the currency type for a specific account."""
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                UPDATE Account SET currency_type = ? WHERE id = ?
+            """, (currency_type, user_id))
+
+            if cursor.rowcount == 0:
+                return {"success": False, "message": "User not found."}
+
+            conn.commit()
+        except sqlite3.Error as e:
+            return {"success": False, "message": str(e)}
+        finally:
+            conn.close()
+
+        return {"success": True}
+
+    @staticmethod
+    def get_account_currency(user_id):
+        """Gets the currency type for a specific account."""
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT currency_type FROM Account WHERE id = ?", (user_id,))
+        result = cursor.fetchone()
+        conn.close()        
 
 ## Fatma ------------------
 class Donation:
@@ -207,3 +237,24 @@ class Donation:
             return False, f"Error: {str(e)}"
         finally:
             conn.close()
+## Hana Nazmy
+class Currency:
+    @staticmethod
+    def get_all_currencies():
+        #Fetches all available currencies from the database.
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM Currency")
+        currencies = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        return currencies
+    
+    @staticmethod
+    def get_conversion_rate(currency_name):
+        #Fetches the conversion rate of a specific currency.
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT conversion_rate_to_egp FROM Currency WHERE name = ?", (currency_name,))
+        rate_row = cursor.fetchone()
+        conn.close()
+        return rate_row[0] if rate_row else None
