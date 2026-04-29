@@ -65,37 +65,14 @@ The ERD below represents the application's database structure:
 ![ERD](/images/image-1.png)
 
 ### Team Members
-- Abdallah Beshary [contact](https://www.linkedin.com/in/abdallahbeshary/)
-- Hana Nazmy [contact](https://www.linkedin.com/in/hana-nazmy-b065b925b/)
-- Hana Gamal [contact](https://www.linkedin.com/in/hana-gamal-abuelyazeed/)
-- Fatma Ahmed [contact](https://www.linkedin.com/in/fatma-ahmed-6487a6256/)
-- Shahd Abdallah [contact](https://www.linkedin.com/in/shahd-abdallah-bb1753286/)
-- Nada Ayman [contact](https://www.linkedin.com/in/nada-ayman-6296b5254/)
+- Abdallah Beshary
+- Mohamed Abdelsalam 
+- Ahmed Abdelkader
+- Mohamed Elsaeed
+- Fatma Ahmed
+- Shahd Abdallah
+- Hana Gamal
+- Hana Nazmy
 
 
 
-
-<!-- Functions
-Key Functions in the Application:
-User Registration (register_user):
-Handles new user sign-ups with validation for strong passwords and unique usernames.
-User Login (login_user):
-Validates user credentials to grant access.
-Deposit Funds (deposit_funds):
-Adds the specified amount to the user's account balance.
-Withdraw Funds (withdraw_funds):
-Deducts the specified amount from the user's account balance, ensuring sufficient funds.
-Donation (make_donation):
-Processes donations and logs them in the database.
-Balance Check (check_balance):
-Retrieves and displays the current balance for the user.
-Transfer Funds (transfer_funds):
-Allows transferring money between two accounts.
-Currency Conversion (convert_currency):
-Converts the user's balance to Egyptian Pounds (EGP) based on the latest exchange rates.
-Feel free to contribute, report issues, or suggest features to make this application even better! -->
-
-<!-- 
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/) -->
