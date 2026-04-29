@@ -213,7 +213,72 @@ class Account:
         cursor = conn.cursor()
         cursor.execute("SELECT currency_type FROM Account WHERE id = ?", (user_id,))
         result = cursor.fetchone()
-        conn.close()        
+        conn.close()    
+            
+# Mohamed Alsaeed
+    @staticmethod
+    def view_account_balance(user_id):
+        """Returns the current balance for a specific account."""
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT balance FROM Account WHERE id = ?", (user_id,))
+            result = cursor.fetchone()
+            return result[0] if result else None
+        finally:
+            conn.close()
+        
+    @staticmethod
+    def deposit(user_id, amount):
+        if amount <= 0:
+            return "Deposit amount must be greater than zero."
+
+        conn = sqlite3.connect(DB_PATH, timeout=10)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                UPDATE Account SET balance = balance + ? WHERE id = ?
+            """, (amount, user_id))
+
+            if cursor.rowcount == 0:
+                return "Account not found."
+
+            conn.commit()
+            Account.log_transaction("Deposit", amount, None, user_id)
+            return "Deposit successful."
+        except sqlite3.Error as e:
+            return f"Error: {str(e)}"
+        finally:
+            conn.close()
+
+    @staticmethod
+    def withdraw(user_id, amount):
+        if amount <= 0:
+            return "Withdrawal amount must be greater than zero."
+
+        conn = sqlite3.connect(DB_PATH, timeout=10)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT balance FROM Account WHERE id = ?", (user_id,))
+            row = cursor.fetchone()
+            if not row:
+                return "Account not found."
+
+            current_balance = row[0]
+            if current_balance < amount:
+                return "Insufficient balance."
+
+            cursor.execute("""
+                UPDATE Account SET balance = balance - ? WHERE id = ?
+            """, (amount, user_id))
+
+            conn.commit()
+            Account.log_transaction("Withdraw", amount, user_id, None)
+            return "Withdrawal successful."
+        except sqlite3.Error as e:
+            return f"Error: {str(e)}"
+        finally:
+            conn.close()
 
 ## Fatma ------------------
 class Donation:
