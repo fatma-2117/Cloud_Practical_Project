@@ -108,3 +108,79 @@ def initialize_database():
     conn.close()
 
 ##### Beshary & Abdelkader #####
+
+##### HanaGamal
+
+# Account Class
+class Account:
+    def __init__(self, username, password, email, phone, national_id, balance=0, currency_type='EGP'):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.phone = phone
+        self.national_id = national_id
+        self.balance = balance
+        self.currency_type = currency_type
+    @staticmethod
+    def create_account(username, password, email, phone, national_id, currency_type='EGP'):
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        try:
+            hashed_password = hash_password(password)  
+            cursor.execute("""
+                INSERT INTO Account (username, password, email, phone, national_id, balance, currency_type)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (username, hashed_password, email, phone, national_id, 0, currency_type))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            return False
+        finally:
+            conn.close()
+        return True
+
+    @staticmethod
+    def login(username, password):
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT * FROM Account WHERE username = ?
+        """, (username,))
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            hashed_password = result[2]  
+            if check_password(password, hashed_password):
+                return result  
+        return None  
+    
+    @staticmethod
+    def is_username_unique(username):
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1 FROM Account WHERE username = ?", (username,))
+        result = cursor.fetchone()
+        conn.close()
+        return result is None
+
+    @staticmethod
+    def deposit(user_id, amount):
+        if amount <= 0:
+            return "Deposit amount must be greater than zero."
+
+        conn = sqlite3.connect(DB_PATH, timeout=10)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                UPDATE Account SET balance = balance + ? WHERE id = ?
+            """, (amount, user_id))
+
+            if cursor.rowcount == 0:
+                return "Account not found."
+
+            conn.commit()
+            Account.log_transaction("Deposit", amount, None, user_id)
+            return "Deposit successful."
+        except sqlite3.Error as e:
+            return f"Error: {str(e)}"
+        finally:
+            conn.close()
