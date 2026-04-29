@@ -184,3 +184,26 @@ class Account:
             return f"Error: {str(e)}"
         finally:
             conn.close()
+
+## Fatma ------------------
+class Donation:
+     @staticmethod
+     def add_donation(donor_id, organization, amount, currency_type='EGP'):
+        # Use a timeout to reduce likelihood of "database is locked" errors
+        conn = sqlite3.connect(DB_PATH, timeout=10)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO Donations (donor_id, organization, amount, date, currency_type)
+                VALUES (?, ?, ?, ?, ?)
+            """, (donor_id, organization, amount, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), currency_type))
+            cursor.execute("""
+                UPDATE Account SET balance = balance - ? WHERE id = ?
+            """, (amount, donor_id))
+            conn.commit()
+            return True, "Donation successful."
+        except Exception as e:
+            print("Error adding donation:", e)
+            return False, f"Error: {str(e)}"
+        finally:
+            conn.close()
